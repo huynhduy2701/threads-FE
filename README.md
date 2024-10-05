@@ -18,6 +18,14 @@ down router-dom và react-icon
 # npm i react-router-dom react-icon
 # yarn add react-router-dom react-icon
 
+
+# https://recoiljs.org/ yarn add recoil dùng để sử dụng auth 
+
+
+cloudinary
+
 down nodemon
 # npm install -D nodemon
 # npm install express jsonwebtoken bcrypt dotenv mongoose cooke-parser
+
+# yarn add cloudinary
