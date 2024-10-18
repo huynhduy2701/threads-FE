@@ -60,7 +60,6 @@ export default function Signup() {
          isClosable: true,
          description: data.error,
          duration:3000,
-         isClosable:true
        });
        return;
       }

@@ -27,5 +27,6 @@ cloudinary
 down nodemon
 # npm install -D nodemon
 # npm install express jsonwebtoken bcrypt dotenv mongoose cooke-parser
+# npm install multer
 
 # yarn add cloudinary
