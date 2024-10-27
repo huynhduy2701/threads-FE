@@ -16,7 +16,7 @@ import { useRef, useState } from "react";
 import { useRecoilState } from "recoil";
 import userAtom from "../atoms/userAtom";
 import usePreviewImg from "../hooks/usePreviewImg";
-
+import useShowToast from "../hooks/useShowToast";
 export default function UpdateProfilePage() {
     const [user,setUser] = useRecoilState(userAtom);
     const [inputs,setInputs] = useState({
@@ -26,29 +26,41 @@ export default function UpdateProfilePage() {
         email:user.email,
         password:""
     })
+    const [updating, setUpdating] = useState(false);
     console.log(">>> check user in updatePorfile ",user);
 
     const fileRef = useRef(null);
 
     const { handleImageChange,imgUrl } = usePreviewImg();
 
-
+  const showToast = useShowToast();
     const handleUpdate = async (e)=>{
         e.preventDefault();
         console.log(inputs);
+        if (updating) {
+          return
+        }
+        setUpdating(true);
         try {
-            const res = await fetch(`/api/users/update/${user._id}`, {
-              method: "PUT",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ ...inputs, profilePic: imgUrl }),
-            });
-            const data = await res.json();
-            console.log(">>> check data in updatePorfile : ",data);
-            
+          const res = await fetch(`api/users/update/${user._id}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ ...inputs, profilePic: imgUrl }),
+          });
+          const data = await res.json(); // updata user object
+          console.log(">>> check data in updatePorfile : ", data);
+          if (data.error) {
+            return showToast("Lỗi Cập Nhật", data.error, "error");
+          }
+          showToast("Cập Nhật Thành Công", data.messages, "success");
+          setUser(data.user); // Cập nhật state với dữ liệu người dùng đã cập nhật
+          localStorage.setItem("user-threads", JSON.stringify(data.user)); // Lưu vào localStorage để giữ lại sau khi reload
         } catch (error) {
             console.log(error);
+        } finally{
+          setUpdating(false);
         }
     }
   return (
@@ -164,6 +176,7 @@ export default function UpdateProfilePage() {
                 bg: "blue.500",
               }}
               type="submit"
+              isLoading={updating}
             >
               Thay đổi
             </Button>

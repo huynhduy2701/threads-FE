@@ -1,9 +1,19 @@
-import { Avatar, Box, Flex, Link, Menu, MenuButton, MenuItem, MenuList, Portal, Text, useToast, VStack } from "@chakra-ui/react"
+import { Avatar, Box, Button, Flex, Link, Menu, MenuButton, MenuItem, MenuList, Portal, Text, useToast, VStack } from "@chakra-ui/react"
 import { FaInstagram } from "react-icons/fa";
 import { CiCircleMore } from "react-icons/ci";
 import { CiLink } from "react-icons/ci";
-const UserHeade = () => {
-  const toast = useToast()
+import { useRecoilValue } from "recoil";
+import userAtom from "../atoms/userAtom";
+import { useState } from "react";
+import useShowToast from "../hooks/useShowToast";
+const UserHeader = ({user}) => {
+  const toast = useToast();
+  const currentUser = useRecoilValue(userAtom) ; // user đăng nhập 
+  const [follwing, setFollowing] =  useState(user.followers.includes(currentUser._id)) ;
+  const [updating, setUpdating] = useState(false) ;
+  console.log("following : " , follwing);
+  const showToast = useShowToast();
+
   const copyURL = ()=>{
     const currentURL = window.location.href; //Trả về URL hiện tại của trang web. Đây là chuỗi chứa toàn bộ địa chỉ URL, ví dụ như https://example.com.
     // console.log(currentURL);
@@ -28,76 +38,154 @@ const UserHeade = () => {
     }) ;
 
   }
+
+  const handleFollowAndUnFollow = async () =>{
+    if (!currentUser) {
+      showToast("Lỗi","Vui Lòng đăng nhập để theo dõi","error");
+      return ;
+    }
+    if (updating) {
+      return
+    }
+
+    setUpdating(true);
+    try {
+      const res = await fetch(`/api/users/follow/${user._id}`,{
+        method : "POST",
+        headers : {
+          "Content-Type" : "application/json"
+
+        }
+      })
+      const data = await res.json();
+      console.log("data userHeader : " , data)
+      if (data.error) {
+        return showToast("Lỗi theo dõi người dùng",data.error,"error");
+      }
+
+      if (follwing) {
+         showToast("Thành công",`Bỏ theo dõi ${user.name}`, "success");
+         user.followers.pop();
+      }else{
+         showToast("Thành công",`Theo dõi ${user.name}`, "success");
+         user.followers.push(currentUser._id);
+      }
+      // showToast("Thành công", data.message, "success");
+      setFollowing(!follwing)
+    } catch (error) {
+     console.error(error);
+    } finally{
+      setUpdating(false);
+    }
+  }
   return (
     // stack Ngăn xếp là thành phần bố cục được sử dụng để nhóm các phần tử lại với nhau và áp dụng khoảng cách giữa chúng.
     <VStack gap={4} alignItems={"start"}>
       <Flex justifyContent={"space-between"} w={"full"}>
         <Box>
-            <Text fontSize={"2xl"} fontWeight={"bold"}>
-                Henry
+          <Text fontSize={"2xl"} fontWeight={"bold"}>
+            {user.name}
+          </Text>
+          <Flex gap={2} alignItems={"center"}>
+            <Text fontSize={"sm"}>{user.username}</Text>
+            <Text
+              fontSize={{ base: "xs", md: "sm", lg: "md" }}
+              bg={"gray.dark"}
+              color={"gray.light"}
+              p={1}
+              borderRadius={"full"}
+            >
+              threads.next
             </Text>
-            <Flex gap={2} alignItems={"center"}>
-                <Text fontSize={"sm"}>iamHenry</Text>
-                <Text 
-                    fontSize={{base:"xs",md:"sm",lg:"md"}} 
-                    bg={"gray.dark"} 
-                    color={"gray.light"} 
-                    p={1}
-                    borderRadius={"full"}>
-                    threads.next
-                </Text>
-            </Flex>
+          </Flex>
         </Box>
         <Box>
+          {user.profilePic && (
             <Avatar
-            name="Henry"
-            src="/logo-henry.jpg"
-            size={
-              {
-                base : "sm",
-                md:"xl",//responsive
-              }
-            }
+              name={user.name}
+              src={user.profilePic}
+              size={{
+                base: "sm",
+                md: "xl", //responsive
+              }}
             />
+          )}
+          {!user.profilePic && (
+            <Avatar
+              name={user.name}
+              src="https://bit.ly/broken-link"
+              size={{
+                base: "sm",
+                md: "xl", //responsive
+              }}
+            />
+          )}
         </Box>
       </Flex>
-      <Text> 
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aut hic, commodi cum necessitatibus, veritatis accusantium dolor quaerat
-      </Text>
+      <Text>{user.bio}</Text>
+
+      {currentUser._id === user._id && (
+        <Link href="/update" width="full">
+          <Button width={"full"} isLoading={updating}>Chỉnh sửa trang cá nhân</Button>
+        </Link>
+      )}
+      {currentUser._id !== user._id && (
+        <Link  width="full">
+          <Button width={"full"} onClick={handleFollowAndUnFollow} isLoading={updating}>
+             {follwing ? "Hủy theo dõi" : "Theo dõi"}
+          </Button>
+        </Link>
+      )}
+
       <Flex w={"full"} justifyContent={"space-between"}>
-         <Flex gap={2} alignItems={"center"}>
-            <Text color={"gray.light"}>3.2k followers</Text>
-            <Box w={1} h={1} bg={"gray.light"} borderRadius={"full"}></Box>
-            <Link color={"gray.light"}>instagram.com</Link>
-         </Flex>
-          <Flex>
-            <Box className="icon-container">
-                <FaInstagram size={24} cursor={"pointer"}/>
-            </Box>
-            <Box className="icon-container">
-                <Menu>
-                  <MenuButton>
-                    <CiCircleMore size={24} cursor={"pointer"}/>
-                  </MenuButton>
-                  <Portal>
-                  <MenuList bg={"gray.dark"}>
-                    <MenuItem bg={"gray.dark"} onClick={copyURL}>Coppy Link <CiLink size={24} ml={"10"}/> </MenuItem>
-                  </MenuList>
-                  </Portal>
-                </Menu>
-            </Box>
-          </Flex>
+        <Flex gap={2} alignItems={"center"}>
+          <Text color={"gray.light"}>{user.followers.length} followers</Text>
+          <Box w={1} h={1} bg={"gray.light"} borderRadius={"full"}></Box>
+          <Link color={"gray.light"}>instagram.com</Link>
+        </Flex>
+        <Flex>
+          <Box className="icon-container">
+            <FaInstagram size={24} cursor={"pointer"} />
+          </Box>
+          <Box className="icon-container">
+            <Menu>
+              <MenuButton>
+                <CiCircleMore size={24} cursor={"pointer"} />
+              </MenuButton>
+              <Portal>
+                <MenuList bg={"gray.dark"}>
+                  <MenuItem bg={"gray.dark"} onClick={copyURL}>
+                    Coppy Link <CiLink size={24} ml={"10"} />{" "}
+                  </MenuItem>
+                </MenuList>
+              </Portal>
+            </Menu>
+          </Box>
+        </Flex>
       </Flex>
       <Flex w={"full"}>
-        <Flex flex={1} borderBottom={"1.5px solid white"} justifyContent={"center"} pb={3} cursor={"pointer"}>
+        <Flex
+          flex={1}
+          borderBottom={"1.5px solid white"}
+          justifyContent={"center"}
+          pb={3}
+          cursor={"pointer"}
+        >
           <Text fontWeight={"bold"}>Threads</Text>
         </Flex>
-        <Flex flex={1} borderBottom={"1.5px solid gray"} color={"gray.light"} justifyContent={"center"} pb={3} cursor={"pointer"}>
+        <Flex
+          flex={1}
+          borderBottom={"1.5px solid gray"}
+          color={"gray.light"}
+          justifyContent={"center"}
+          pb={3}
+          cursor={"pointer"}
+        >
           <Text fontWeight={"bold"}>Replies</Text>
         </Flex>
       </Flex>
     </VStack>
-  )
+  );
 }
 
-export default UserHeade
+export default UserHeader;
