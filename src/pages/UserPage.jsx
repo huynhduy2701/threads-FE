@@ -10,6 +10,7 @@ const UserPage = () => {
   const [user, setUser] = useState(null);
   const {username} = useParams();
   const showToast =useShowToast();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const getUser = async ()=>{
@@ -18,22 +19,32 @@ const UserPage = () => {
           const data = await res.json();
           console.log("data in userPage : " ,data);
           if (data.error) {
-              return showToast("Lỗi",data.error,"error");
+              return console.error("Lỗi",data.error);
           }
           setUser(data);
         } catch (error) {
         //  showToast("Lỗi",error,"error");
         console.error(error);
+        }finally{
+          setLoading(false);
         }
     };
     getUser();
   }, [username]);
-  if (!user) return (
+
+  if (!user && loading) return (
     <Flex justifyContent={"center"} alignItems={"center"} height="100vh">
       <Spinner mr={5}/>
-      Đang tìm kím người dùng ...
+      
     </Flex>
   );
+    if (!user && !loading)
+      return (
+        <Flex justifyContent={"center"} alignItems={"center"} height="100vh">
+          <Spinner mr={5} />
+          Không tìm thấy người dùng ...
+        </Flex>
+      );
   return (
     <>
       <UserHeader user={user} />

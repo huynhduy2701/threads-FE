@@ -29,7 +29,7 @@ export default function Signup() {
   const setAuthScreen = useSetRecoilState(authScreenAtom);
   const setUser = useSetRecoilState(userAtom);
   const showToast = useShowToast();
-  
+  const [loading, setLoading] = useState(false);
   const [inputs, setInputs] = useState({
     name: "",
     username : "",
@@ -40,6 +40,7 @@ export default function Signup() {
   const toast = useToast();
   const handleSignup = async ()=>{
     console.log(inputs);
+    setLoading(true);
     try {
       const res = await fetch("/api/users/signup", {
         method: "POST", //Định nghĩa loại yêu cầu HTTP là POST. Yêu cầu POST thường được dùng để gửi dữ liệu tới máy chủ (trong trường hợp này là dữ liệu đăng ký người dùng).
@@ -69,6 +70,8 @@ export default function Signup() {
       
     } catch (error) {
       console.log(error);
+    }finally{
+      setLoading(false);
     }
   }
   return (
@@ -129,7 +132,7 @@ export default function Signup() {
             </FormControl>
             <Stack spacing={10} pt={2}>
               <Button
-                loadingText="Submitting"
+               
                 size="lg"
                 bg={useColorModeValue("gray.600", "gray.700")}
                 color={"white"}
@@ -137,6 +140,7 @@ export default function Signup() {
                   bg: useColorModeValue("gray.700", "gray.800"),
                 }}
                 onClick={handleSignup}
+                isLoading={loading}
               >
                 Đăng kí
               </Button>

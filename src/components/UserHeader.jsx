@@ -1,4 +1,18 @@
-import { Avatar, Box, Button, Flex, Link, Menu, MenuButton, MenuItem, MenuList, Portal, Text, useToast, VStack } from "@chakra-ui/react"
+import {
+  Avatar,
+  Box,
+  Button,
+  Flex,
+  Link,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Portal,
+  Text,
+  useToast,
+  VStack,
+} from "@chakra-ui/react";
 import { FaInstagram } from "react-icons/fa";
 import { CiCircleMore } from "react-icons/ci";
 import { CiLink } from "react-icons/ci";
@@ -6,78 +20,82 @@ import { useRecoilValue } from "recoil";
 import userAtom from "../atoms/userAtom";
 import { useState } from "react";
 import useShowToast from "../hooks/useShowToast";
-const UserHeader = ({user}) => {
+const UserHeader = ({ user }) => {
   const toast = useToast();
-  const currentUser = useRecoilValue(userAtom) ; // user đăng nhập 
-  const [follwing, setFollowing] =  useState(user.followers.includes(currentUser._id)) ;
-  const [updating, setUpdating] = useState(false) ;
-  console.log("following : " , follwing);
+  const currentUser = useRecoilValue(userAtom); // user đăng nhập
+  const [follwing, setFollowing] = useState(
+    user.followers.includes(currentUser._id)
+  );
+  const [updating, setUpdating] = useState(false);
+  console.log("following : ", follwing);
   const showToast = useShowToast();
 
-  const copyURL = ()=>{
+  const copyURL = () => {
     const currentURL = window.location.href; //Trả về URL hiện tại của trang web. Đây là chuỗi chứa toàn bộ địa chỉ URL, ví dụ như https://example.com.
     // console.log(currentURL);
-    navigator.clipboard.writeText(currentURL).then(()=>{
+    navigator.clipboard.writeText(currentURL).then(() => {
       //navigator.clipboard: Đây là API của trình duyệt dùng để tương tác với clipboard (bộ nhớ tạm).
-      //writeText(currentURL): Đây là phương thức để sao chép nội dung văn bản vào clipboard. Ở đây, nó sao chép giá trị currentURL (URL hiện tại của trang web).
-      console.log("Url copied to clipboard") ;
+      //writeText(currentURL): Đây là phương thức để sao chép nội dung văn bảng vào clipboard. Ở đây, nó sao chép giá trị currentURL (URL hiện tại của trang web).
+      console.log("Url copied to clipboard");
       const examplePromise = new Promise((resolve, reject) => {
-        setTimeout(() => resolve(200), 1000)
-      })
+        setTimeout(() => resolve(200), 1000);
+      });
 
       // Will display the loading toast until the promise is either resolved
       // or rejected.
-      toast.promise(examplePromise, {
-        success: { title: 'Coppy URL thành công'},
-        error: { title: 'Coppy URL thất bại'},
-        loading: { title: 'Vui lòng chờ' }
-        
-      },{
-        position: 'top'
-      })
-    }) ;
+      toast.promise(
+        examplePromise,
+        {
+          success: { title: "Coppy URL thành công" },
+          error: { title: "Coppy URL thất bại" },
+          loading: { title: "Vui lòng chờ" },
+        },
+        {
+          position: "top",
+        }
+      );
+    });
+  };
 
-  }
-
-  const handleFollowAndUnFollow = async () =>{
+  const handleFollowAndUnFollow = async () => {
     if (!currentUser) {
-      showToast("Lỗi","Vui Lòng đăng nhập để theo dõi","error");
-      return ;
+      showToast("Lỗi", "Vui Lòng đăng nhập để theo dõi", "error");
+      return;
     }
     if (updating) {
-      return
+      // Đặt trạng thái updating thành true để ngăn người dùng gửi thêm yêu cầu trong khi thao tác đang xử lý.
+      return;
     }
 
     setUpdating(true);
     try {
-      const res = await fetch(`/api/users/follow/${user._id}`,{
-        method : "POST",
-        headers : {
-          "Content-Type" : "application/json"
-
-        }
-      })
+      const res = await fetch(`/api/users/follow/${user._id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
       const data = await res.json();
-      console.log("data userHeader : " , data)
+      console.log("data userHeader : ", data);
       if (data.error) {
-        return showToast("Lỗi theo dõi người dùng",data.error,"error");
+        return showToast("Lỗi theo dõi người dùng", data.error, "error");
       }
 
       if (follwing) {
-         showToast("Thành công",`Bỏ theo dõi ${user.name}`, "success");
-         user.followers.pop();
-      }else{
-         showToast("Thành công",`Theo dõi ${user.name}`, "success");
-         user.followers.push(currentUser._id);
+        showToast("Thành công", `Bỏ theo dõi ${user.name}`, "success");
+        user.followers.pop();
+      } else {
+        showToast("Thành công", `Theo dõi ${user.name}`, "success");
+        user.followers.push(currentUser._id);
       }
       // showToast("Thành công", data.message, "success");
-      setFollowing(!follwing)
+      setFollowing(!follwing);
     } catch (error) {
-     console.error(error);
-    } finally{
+      console.error(error);
+    } finally {
       setUpdating(false);
     }
-  }
+  };
   return (
     // stack Ngăn xếp là thành phần bố cục được sử dụng để nhóm các phần tử lại với nhau và áp dụng khoảng cách giữa chúng.
     <VStack gap={4} alignItems={"start"}>
@@ -126,13 +144,19 @@ const UserHeader = ({user}) => {
 
       {currentUser._id === user._id && (
         <Link href="/update" width="full">
-          <Button width={"full"} isLoading={updating}>Chỉnh sửa trang cá nhân</Button>
+          <Button width={"full"} isLoading={updating}>
+            Chỉnh sửa trang cá nhân
+          </Button>
         </Link>
       )}
       {currentUser._id !== user._id && (
-        <Link  width="full">
-          <Button width={"full"} onClick={handleFollowAndUnFollow} isLoading={updating}>
-             {follwing ? "Hủy theo dõi" : "Theo dõi"}
+        <Link width="full">
+          <Button
+            width={"full"}
+            onClick={handleFollowAndUnFollow}
+            isLoading={updating}
+          >
+            {follwing ? "Hủy theo dõi" : "Theo dõi"}
           </Button>
         </Link>
       )}
@@ -186,6 +210,6 @@ const UserHeader = ({user}) => {
       </Flex>
     </VStack>
   );
-}
+};
 
 export default UserHeader;

@@ -30,9 +30,11 @@ export default function Login() {
   const [inputs, setInputs] = useState({
     username: "",
     password: "",
-  })
-   const showToast = useShowToast();
-  const handleLogin = async()=>{
+  });
+  const [loading, setLoading] = useState(false);
+  const showToast = useShowToast();
+  const handleLogin = async () => {
+    setLoading(true);
     const { username, password } = inputs;
 
     // Kiểm tra xem username hoặc password có bị bỏ trống không
@@ -61,15 +63,17 @@ export default function Login() {
       const data = await res.json();
       console.log(data);
       if (data.error) {
-        return showToast("Lỗi đăng nhập",data.error,"error")
+        return showToast("Lỗi đăng nhập", data.error, "error");
       }
       showToast("Đăng nhập", data.message, "success");
-      localStorage.setItem("user-threads",JSON.stringify(data));
+      localStorage.setItem("user-threads", JSON.stringify(data));
       setUser(data);
     } catch (error) {
       console.log(error);
+    }finally{
+      setLoading(false);
     }
-  }
+  };
   return (
     <Flex align={"center"} justify={"center"}>
       <Stack spacing={8} mx={"auto"} maxW={"lg"} py={12} px={6}>
@@ -91,12 +95,24 @@ export default function Login() {
           <Stack spacing={4}>
             <FormControl isRequired>
               <FormLabel>Username</FormLabel>
-              <Input type="text" onChange={(e)=>setInputs({...inputs,username:e.target.value})} value={inputs.username}/>
+              <Input
+                type="text"
+                onChange={(e) =>
+                  setInputs({ ...inputs, username: e.target.value })
+                }
+                value={inputs.username}
+              />
             </FormControl>
             <FormControl isRequired>
               <FormLabel>Mật khẩu</FormLabel>
               <InputGroup>
-                <Input type={showPassword ? "text" : "password"} onChange={(e)=>setInputs({...inputs,password: e.target.value})} value={inputs.password} />
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  onChange={(e) =>
+                    setInputs({ ...inputs, password: e.target.value })
+                  }
+                  value={inputs.password}
+                />
                 <InputRightElement h={"full"}>
                   <Button
                     variant={"ghost"}
@@ -111,7 +127,6 @@ export default function Login() {
             </FormControl>
             <Stack spacing={10} pt={2}>
               <Button
-                loadingText="Submitting"
                 size="lg"
                 bg={useColorModeValue("gray.600", "gray.700")}
                 color={"white"}
@@ -119,6 +134,7 @@ export default function Login() {
                   bg: useColorModeValue("gray.700", "gray.800"),
                 }}
                 onClick={handleLogin}
+                isLoading={loading}
               >
                 Đăng nhập
               </Button>
@@ -126,7 +142,10 @@ export default function Login() {
             <Stack pt={6}>
               <Text align={"center"}>
                 Bạn chưa có tài khoản ?{" "}
-                <Link color={"blue.400"} onClick={() => setAuthScreen('signup')}>
+                <Link
+                  color={"blue.400"}
+                  onClick={() => setAuthScreen("signup")}
+                >
                   Đăng kí
                 </Link>
               </Text>
