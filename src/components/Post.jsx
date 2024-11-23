@@ -4,9 +4,10 @@ import Action from "./Action";
 import { useEffect, useState } from "react";
 import useShowToast from "../hooks/useShowToast";
 import { useNavigate } from "react-router-dom";
+import {formatDistanceToNow} from "date-fns";
 
 const Post = ({ post, postedBy }) => {
-  const [liked, setLiked] = useState(false);
+  // const [liked, setLiked] = useState(false);
   const showToast = useShowToast();
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
@@ -105,10 +106,10 @@ const Post = ({ post, postedBy }) => {
               />
             </Flex>
             <Flex gap={4} alignItems={"center"}>
-              <Text fontSize={"sm"} color={"gray.light"}>
-                1d
+              <Text fontSize={"sm"} w={36} textAlign={"right"} color={"gray.light"}>
+                {formatDistanceToNow(new Date(post.createdAt))} ago
               </Text>
-              <BsThreeDots cursor={"pointer"} />
+              {/* <BsThreeDots cursor={"pointer"} /> */}
             </Flex>
           </Flex>
           <Text fontSize={"sm"}>{post.text}</Text>
@@ -124,18 +125,10 @@ const Post = ({ post, postedBy }) => {
           )}
 
           <Flex gap={3} my={1}>
-            <Action liked={liked} setLiked={setLiked} />
+            <Action post={post} />
           </Flex>
 
-          <Flex gap={2} alignItems={"center"}>
-            <Text color={"gray.light"} fontSize={"sm"} textDecoration="none">
-              {post.replies.length} Replies
-            </Text>
-            <Box w={0.5} h={0.5} borderRadius={"full"} bg={"gray.light"}></Box>
-            <Text color={"gray.light"} fontSize={"sm"} textDecoration="none">
-              {post.likes.length} likes
-            </Text>
-          </Flex>
+         
         </Flex>
       </Flex>
     </Link>
