@@ -27,12 +27,12 @@ const Comment = ({ userAvatar, creatAt, comment, username, likes }) => {
             </Flex>
           </Flex>
           <Text>{comment}</Text>
-          <Action
+          {/* <Action
             liked={liked}
             setLiked={setLiked}
             repost={repost}
             setRepost={setRepost}
-          />
+          /> */}
           <Text fontSize={"sm"} color={"gray.light"}>
             {likes + (liked ? 1 : 0)} likes
           </Text>

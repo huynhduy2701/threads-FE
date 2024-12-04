@@ -5,12 +5,16 @@ import {useParams} from "react-router-dom"
 import { useEffect } from "react";
 import useShowToast from "../hooks/useShowToast";
 import { Flex, Spinner } from "@chakra-ui/react";
+import Post from "../components/Post.jsx";
+
 
 const UserPage = () => {
   const [user, setUser] = useState(null);
   const {username} = useParams();
   const showToast =useShowToast();
   const [loading, setLoading] = useState(true);
+  const [posts, setPosts] = useState([]);
+  const [fetchingPosts, setFetchingPosts] = useState(true) ;
 
   useEffect(() => {
     const getUser = async ()=>{
@@ -29,7 +33,25 @@ const UserPage = () => {
           setLoading(false);
         }
     };
+
+    const getPost = async ()=>{
+      setFetchingPosts(true);
+      try {
+        const res  = await fetch(`/api/post/user/${username}`);
+        const data = await res.json();
+        console.log("data in userPage : " ,data);
+        setPosts(data);
+        console.log("posts in userPage : ", posts);
+      } catch (error) {
+        showToast("Lỗi",error.message,"error");
+        setPosts([]);
+      } finally {
+        setFetchingPosts(false);
+      }
+    } 
+
     getUser();
+    getPost();
   }, [username]);
 
   if (!user && loading) return (
@@ -48,7 +70,7 @@ const UserPage = () => {
   return (
     <>
       <UserHeader user={user} />
-      <UserPost
+      {/* <UserPost
         likes={1200}
         replies={481}
         postImg="/post1.png"
@@ -59,7 +81,22 @@ const UserPage = () => {
         replies={481}
         postImg="/post3.webp"
         postTitle="I am Henry."
-      />
+      /> */}
+      {!fetchingPosts && posts.length === 0 && (
+        <h1>Người dùng này chưa có đăng bài viết</h1>
+      )}
+      {fetchingPosts && (
+        <Flex justifyContent={"center"} my={12}>
+          <Spinner size={"xl"} />
+        </Flex>
+      )}
+
+      {/* {posts.map((post) => {
+        <Post key={post._id} post={post} postedBy={post.postedBy} />;
+      })} */}
+      {posts.map((post) => (
+        <Post key={post._id} post={post} postedBy={post.postedBy} />
+      ))}
     </>
   );
 }

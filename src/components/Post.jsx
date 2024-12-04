@@ -5,12 +5,17 @@ import { useEffect, useState } from "react";
 import useShowToast from "../hooks/useShowToast";
 import { useNavigate } from "react-router-dom";
 import {formatDistanceToNow} from "date-fns";
+import {DeleteIcon} from "@chakra-ui/icons"
+import { useRecoilValue } from "recoil";
+import userAtom from "../atoms/userAtom";
+
 
 const Post = ({ post, postedBy }) => {
   // const [liked, setLiked] = useState(false);
   const showToast = useShowToast();
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
+  const currentUser = useRecoilValue(userAtom);
   useEffect(() => {
     const getUser = async () => {
       try {
@@ -106,10 +111,19 @@ const Post = ({ post, postedBy }) => {
               />
             </Flex>
             <Flex gap={4} alignItems={"center"}>
-              <Text fontSize={"sm"} w={36} textAlign={"right"} color={"gray.light"}>
-                {formatDistanceToNow(new Date(post.createdAt))} ago
+              <Text
+                fontSize={"sm"}
+                w={36}
+                textAlign={"right"}
+                color={"gray.light"}
+              >
+                {formatDistanceToNow(new Date(post.createdAt))} trước
               </Text>
               {/* <BsThreeDots cursor={"pointer"} /> */}
+              {currentUser?._id === user._id && (
+                <DeleteIcon size={20} />
+
+              )}
             </Flex>
           </Flex>
           <Text fontSize={"sm"}>{post.text}</Text>
@@ -127,8 +141,6 @@ const Post = ({ post, postedBy }) => {
           <Flex gap={3} my={1}>
             <Action post={post} />
           </Flex>
-
-         
         </Flex>
       </Flex>
     </Link>

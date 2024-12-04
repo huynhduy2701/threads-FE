@@ -36,12 +36,12 @@ const PostPage = () => {
         <Image src={"/post1.png"} w={"full "} />
       </Box>
       <Flex gap={3} my={3}>
-        <Action
+        {/* <Action
           liked={liked}
           setLiked={setLiked}
           repost={repost}
           setRepost={setRepost}
-        />
+        /> */}
       </Flex>
       <Flex gap={2} alignItems={"center"}>
         <Text color={"gray.light"} fontSize={"sm"}>

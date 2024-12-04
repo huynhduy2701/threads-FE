@@ -24,7 +24,7 @@ const UserHeader = ({ user }) => {
   const toast = useToast();
   const currentUser = useRecoilValue(userAtom); // user đăng nhập
   const [follwing, setFollowing] = useState(
-    user.followers.includes(currentUser._id)
+    user.followers.includes(currentUser?._id)
   );
   const [updating, setUpdating] = useState(false);
   console.log("following : ", follwing);
@@ -86,7 +86,7 @@ const UserHeader = ({ user }) => {
         user.followers.pop();
       } else {
         showToast("Thành công", `Theo dõi ${user.name}`, "success");
-        user.followers.push(currentUser._id);
+        user.followers.push(currentUser?._id);
       }
       // showToast("Thành công", data.message, "success");
       setFollowing(!follwing);
@@ -142,14 +142,14 @@ const UserHeader = ({ user }) => {
       </Flex>
       <Text>{user.bio}</Text>
 
-      {currentUser._id === user._id && (
+      {currentUser?._id === user._id && (
         <Link href="/update" width="full">
           <Button width={"full"} isLoading={updating}>
             Chỉnh sửa trang cá nhân
           </Button>
         </Link>
       )}
-      {currentUser._id !== user._id && (
+      {currentUser?._id !== user._id && (
         <Link width="full">
           <Button
             width={"full"}

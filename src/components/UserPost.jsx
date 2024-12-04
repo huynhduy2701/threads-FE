@@ -3,8 +3,8 @@ import { BsThreeDots } from "react-icons/bs";
 import Action from "./Action";
 import { useState } from "react";
 
-const UserPost = ({postImg,postTitle,likes,replies}) => {
-  const [liked,setLiked] = useState(false);
+const UserPost = ({ postImg, postTitle, likes, replies }) => {
+  const [liked, setLiked] = useState(false);
   return (
     <Link to={"/iamHenry/post/1"} textDecoration="none">
       <Flex gap={3} mb={4} py={5}>
@@ -76,7 +76,8 @@ const UserPost = ({postImg,postTitle,likes,replies}) => {
           )}
 
           <Flex gap={3} my={1}>
-            <Action liked={liked} setLiked={setLiked} />
+            {/* <Action liked={liked} setLiked={setLiked} /> */}
+            {/* <Action post={post} /> */}
           </Flex>
 
           <Flex gap={2} alignItems={"center"}>
@@ -92,6 +93,6 @@ const UserPost = ({postImg,postTitle,likes,replies}) => {
       </Flex>
     </Link>
   );
-}
+};
 
 export default UserPost
