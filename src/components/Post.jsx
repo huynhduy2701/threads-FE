@@ -34,6 +34,26 @@ const Post = ({ post, postedBy }) => {
     };
     getUser();
   }, [postedBy, showToast]);
+
+  const handleDeletePost = async(e)=>{
+    try {
+      e.preventDefault();
+      if (!window.confirm("Bạn có chắc chắn xóa không ?")) {
+        return
+      }
+      const res = await fetch(`/api/post/${post._id}`,{
+        method : "DELETE"
+      })
+      const data = await res.json();
+      console.log("data in Post for handleDeletePost ",data);
+      if (data.error) {
+        return showToast("Lỗi xóa",data.error,"error");
+      }
+      showToast("Thành công", "Xóa thành công", "success");
+    } catch (error) {
+      console.error(error.message)
+    }
+  }
   if (!user) {
     return null;
   }
@@ -79,7 +99,7 @@ const Post = ({ post, postedBy }) => {
               <Avatar
                 size="xs"
                 name="I am Henry 3"
-                src={post.replies[2].userProfilePic}
+                src={post.replies[1].userProfilePic}
                 position={"absolute"}
                 bottom={"0px"}
                 left={"4px"}
@@ -121,7 +141,7 @@ const Post = ({ post, postedBy }) => {
               </Text>
               {/* <BsThreeDots cursor={"pointer"} /> */}
               {currentUser?._id === user._id && (
-                <DeleteIcon size={20} />
+                <DeleteIcon size={20} onClick={handleDeletePost} />
 
               )}
             </Flex>
