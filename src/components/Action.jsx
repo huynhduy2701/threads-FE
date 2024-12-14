@@ -20,10 +20,14 @@ import { useRecoilValue } from "recoil";
 import userAtom from "../atoms/userAtom";
 
 const Action = ({ post: post_ }) => {
+    // console.log("Post prop received:", post_);
   const user = useRecoilValue(userAtom);
   // const [liked, setLiked] = useState(post_.likes.includes(user?._id));
+  // const [liked, setLiked] = useState(
+  //   post_?.likes?.includes(user?._id) || false
+  // );
   const [liked, setLiked] = useState(
-    post_?.likes?.includes(user?._id) || false
+    post_?.likes?.some((id) => id === user?._id) || false
   );
   const [isLiking, setIsLiking] = useState(false);
   const [isReplying, setIsReplying] = useState(false);
@@ -34,6 +38,9 @@ const Action = ({ post: post_ }) => {
  const initialRef = React.useRef(null);
  const finalRef = React.useRef(null);
   const handleLikeAndUnlike = async () => {
+     if (!post || !post._id) {
+       return showToast("Lỗi", "Bài viết không hợp lệ", "error");
+     }
     if (!user) {
       return showToast(
         "Lỗi tương tác bài viết",
@@ -65,6 +72,7 @@ const Action = ({ post: post_ }) => {
         // xóa id hiện tại của user khỏi mảng post.like
         setPost({ ...post, likes: post.likes.filter((id) => id !== user._id) });
       }
+      
       setLiked(!liked);
     } catch (error) {
       showToast("Lỗi", error.message, "error");
@@ -98,7 +106,7 @@ const Action = ({ post: post_ }) => {
       console.log("data in action for handleReply", data);
       onClose();
     } catch (error) {
-      console.error(error.message);
+      console.log(error.message);
     }finally{
       setIsReplying(false);
     }
@@ -172,7 +180,7 @@ const Action = ({ post: post_ }) => {
             <ModalCloseButton />
             <ModalBody pb={6}>
               <FormControl>
-                <Input ref={initialRef} placeholder="Trả lời ở đây" value={reply} onChange={(e)=>setReply(e.target.value)} />
+                <Input ref={initialRef} placeholder={`Bình luận dưới tên ${user.name} `} value={reply} onChange={(e)=>setReply(e.target.value)} />
               </FormControl>
             </ModalBody>
 

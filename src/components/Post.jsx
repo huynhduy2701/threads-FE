@@ -16,6 +16,7 @@ const Post = ({ post, postedBy }) => {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
   const currentUser = useRecoilValue(userAtom);
+  
   useEffect(() => {
     const getUser = async () => {
       try {
@@ -142,7 +143,6 @@ const Post = ({ post, postedBy }) => {
               {/* <BsThreeDots cursor={"pointer"} /> */}
               {currentUser?._id === user._id && (
                 <DeleteIcon size={20} onClick={handleDeletePost} />
-
               )}
             </Flex>
           </Flex>
@@ -160,6 +160,7 @@ const Post = ({ post, postedBy }) => {
 
           <Flex gap={3} my={1}>
             <Action post={post} />
+            
           </Flex>
         </Flex>
       </Flex>
