@@ -1,14 +1,15 @@
-import { Avatar, Box, Flex, Image, Link, Text } from "@chakra-ui/react";
+import { Avatar, Box, Flex, Image, Text } from "@chakra-ui/react";
 import { BsThreeDots } from "react-icons/bs";
 import Action from "./Action";
 import { useEffect, useState } from "react";
 import useShowToast from "../hooks/useShowToast";
 import { useNavigate } from "react-router-dom";
-import {formatDistanceToNow} from "date-fns";
-import {DeleteIcon} from "@chakra-ui/icons"
-import { useRecoilValue } from "recoil";
+import { formatDistanceToNow } from "date-fns";
+import { DeleteIcon } from "@chakra-ui/icons";
+import { useRecoilState, useRecoilValue } from "recoil";
 import userAtom from "../atoms/userAtom";
-
+import { Link } from "react-router-dom";
+import postAtom from "../atoms/postAtom";
 
 const Post = ({ post, postedBy }) => {
   // const [liked, setLiked] = useState(false);
@@ -16,7 +17,8 @@ const Post = ({ post, postedBy }) => {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
   const currentUser = useRecoilValue(userAtom);
-  
+  const [posts, setPosts] = useRecoilState(postAtom);
+  console.log("post of id", post._id);
   useEffect(() => {
     const getUser = async () => {
       try {
@@ -36,30 +38,32 @@ const Post = ({ post, postedBy }) => {
     getUser();
   }, [postedBy, showToast]);
 
-  const handleDeletePost = async(e)=>{
+  const handleDeletePost = async (e) => {
     try {
       e.preventDefault();
       if (!window.confirm("Bạn có chắc chắn xóa không ?")) {
-        return
+        return;
       }
-      const res = await fetch(`/api/post/${post._id}`,{
-        method : "DELETE"
-      })
+      const res = await fetch(`/api/post/${post._id}`, {
+        method: "DELETE",
+      });
       const data = await res.json();
-      console.log("data in Post for handleDeletePost ",data);
+      console.log("data in Post for handleDeletePost ", data);
       if (data.error) {
-        return showToast("Lỗi xóa",data.error,"error");
+        return showToast("Lỗi xóa", data.error, "error");
       }
       showToast("Thành công", "Xóa thành công", "success");
+      setPosts((prev) => prev.filter((p) => p._id !== post._id)); // khi xóa thì không cần tải lại trang để xem xóa chưa
+
     } catch (error) {
-      console.error(error.message)
+      console.error(error.message);
     }
-  }
+  };
   if (!user) {
     return null;
   }
   return (
-    <Link to={`${user.username}/post/${post._id}`} textDecoration="none">
+    <Link to={`/${user.username}/post/${post._id}`} textDecoration="none">
       <Flex gap={3} mb={4} py={5}>
         <Flex flexDirection={"column"} alignItems={"center"}>
           <Avatar
@@ -120,7 +124,7 @@ const Post = ({ post, postedBy }) => {
                   navigate(`${user.username}`);
                 }}
               >
-                {user?.username}{" "}
+                {user?.name}{" "}
               </Text>
               <Image
                 src="/verify.png"
@@ -146,7 +150,9 @@ const Post = ({ post, postedBy }) => {
               )}
             </Flex>
           </Flex>
+
           <Text fontSize={"sm"}>{post.text}</Text>
+
           {post.img && (
             <Box
               borderRadius={6}
@@ -160,7 +166,6 @@ const Post = ({ post, postedBy }) => {
 
           <Flex gap={3} my={1}>
             <Action post={post} />
-            
           </Flex>
         </Flex>
       </Flex>

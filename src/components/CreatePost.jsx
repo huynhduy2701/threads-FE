@@ -21,9 +21,11 @@ import {
 import React, { useRef, useState } from "react";
 import usePreviewImg from "../hooks/usePreviewImg";
 import { BsFillImageFill } from "react-icons/bs";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import userAtom from "../atoms/userAtom";
 import useShowToast from "../hooks/useShowToast";
+import postAtom from "../atoms/postAtom";
+import { useParams } from "react-router-dom";
 
 const MAX_CHAR = 500;
 const CreatePost = () => {
@@ -35,6 +37,10 @@ const CreatePost = () => {
   const user = useRecoilValue(userAtom);
   const showToast = useShowToast();
   const [updating, setUpdating] = useState(false);
+  const [posts, setPosts] = useRecoilState(postAtom);
+  const {username} = useParams();
+
+  console.log("user in createPost", user);
   const handleTextChange = (e) => {
     const inputText = e.target.value;
     if (inputText.length > MAX_CHAR) {
@@ -74,11 +80,16 @@ const CreatePost = () => {
         "Bài viết của bạn đã được đăng thành công",
         "success"
       );
+      if (username === user.username) {
+        setPosts([data, ...posts]);
+        
+      }
       onClose();
       setPostText("");
+      setImgUrl("");
     } catch (error) {
-      showToast("Lỗi", error.message,"error");
-    }finally{
+      showToast("Lỗi", error.message, "error");
+    } finally {
       setUpdating(false);
     }
   };
@@ -88,12 +99,12 @@ const CreatePost = () => {
       <Button
         position={"fixed"}
         bottom={10}
-        right={10}
-        leftIcon={<AddIcon />}
+        right={5}
         bg={useColorModeValue("gray.300", "gray.dark")}
         onClick={onOpen}
+        size={{ base: "sm", sm: "md", md: "lg" }}
       >
-        Post
+        <AddIcon />
       </Button>
 
       <Modal isOpen={isOpen} onClose={onClose}>

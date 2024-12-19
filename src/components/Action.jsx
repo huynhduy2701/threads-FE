@@ -16,31 +16,34 @@ import {
 } from "@chakra-ui/react";
 import React, { useState } from "react";
 import useShowToast from "../hooks/useShowToast";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import userAtom from "../atoms/userAtom";
+import postAtom from "../atoms/postAtom";
 
-const Action = ({ post: post_ }) => {
-    // console.log("Post prop received:", post_);
+const Action = ({post}) => {
+  // console.log("Post prop received:", post_);
   const user = useRecoilValue(userAtom);
-  // const [liked, setLiked] = useState(post_.likes.includes(user?._id));
+  const [liked, setLiked] = useState(post?.likes?.includes(user?._id));
   // const [liked, setLiked] = useState(
   //   post_?.likes?.includes(user?._id) || false
   // );
-  const [liked, setLiked] = useState(
-    post_?.likes?.some((id) => id === user?._id) || false
-  );
+  // const [liked, setLiked] = useState(
+  //   post_?.likes?.some((id) => id === user?._id) || false
+  // );
   const [isLiking, setIsLiking] = useState(false);
   const [isReplying, setIsReplying] = useState(false);
-  const [reply,setReply] =  useState("");
+  const [reply, setReply] = useState("");
   const showToast = useShowToast();
-  const [post, setPost] = useState(post_);
+  const [posts, setPosts] = useRecoilState(postAtom);
   const { isOpen, onOpen, onClose } = useDisclosure();
- const initialRef = React.useRef(null);
- const finalRef = React.useRef(null);
+  const initialRef = React.useRef(null);
+  const finalRef = React.useRef(null);
+
+
   const handleLikeAndUnlike = async () => {
-     if (!post || !post._id) {
-       return showToast("Lỗi", "Bài viết không hợp lệ", "error");
-     }
+    if (!post || !post._id) {
+      return showToast("Lỗi", "Bài viết không hợp lệ", "error");
+    }
     if (!user) {
       return showToast(
         "Lỗi tương tác bài viết",
@@ -64,15 +67,35 @@ const Action = ({ post: post_ }) => {
       if (data.error) {
         return showToast("Lỗi", data.error, "error");
       }
-      console.log("post_:", post_);
+      console.log("post_:", post);
       if (!liked) {
         //thêm id hiện tại của user vào mảng post.like
-        setPost({ ...post, likes: [...post.likes, user._id] });
+        // setPost({ ...post, likes: [...post.likes, user._id] });
+        const updatedPosts = posts.map((p)=>{
+          if(p._id === post._id){
+            return {...p, likes: [...p.likes, user._id]};
+          }else{
+            return p;
+          }
+        })
+        setPosts(updatedPosts)
       } else {
         // xóa id hiện tại của user khỏi mảng post.like
-        setPost({ ...post, likes: post.likes.filter((id) => id !== user._id) });
+        // setPost({ ...post, likes: post.likes.filter((id) => id !== user._id) });
+        const updatedPosts = posts.map((p)=>{
+          if(p._id === post._id){
+            return {...p, likes: p.likes.filter((id) => id!== user._id)};
+          } else{
+            return p;
+          }
+        })
+        setPosts(updatedPosts)
+
+        // setPosts(
+        //   posts.filter((p) => p._id!== post._id)
+        // );
       }
-      
+
       setLiked(!liked);
     } catch (error) {
       showToast("Lỗi", error.message, "error");
@@ -83,34 +106,47 @@ const Action = ({ post: post_ }) => {
 
   const handleReply = async () => {
     if (!user) {
-      return showToast("Lỗi bình luận","Bạn phải đăng nhập để có thể bình luận","error");
+      return showToast(
+        "Lỗi bình luận",
+        "Bạn phải đăng nhập để có thể bình luận",
+        "error"
+      );
     }
     if (isReplying) {
-      return 
+      return;
     }
     setIsReplying(true);
     try {
-      const res = await fetch("/api/post/reply/"+post._id,{
-        method:"PUT",
-        headers:{
-          "Content-Type":"application/json"
+      const res = await fetch("/api/post/reply/" + post._id, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
         },
-        body:JSON.stringify({text:reply})
-      })
+        body: JSON.stringify({ text: reply }),
+      });
       const data = await res.json();
       if (data.error) {
-        return showToast("Error",data.error,"error");
+        return showToast("Error", data.error, "error");
       }
-      setPost({...post, replies: [...post.replies, data]});
-      showToast("Thành công","Trả lời thành công","success");
+      // setPost({ ...post, replies: [...post.replies, data] });
+      const updatedPosts = posts.map((p)=>{
+        if(p._id === post._id){
+          return {...p, replies: [...p.replies, data]};
+        } else{
+          return p;
+        }
+      })
+      setPosts(updatedPosts);
+      setReply("");
+      showToast("Thành công", "Trả lời thành công", "success");
       console.log("data in action for handleReply", data);
       onClose();
     } catch (error) {
       console.log(error.message);
-    }finally{
+    } finally {
       setIsReplying(false);
     }
-  }
+  };
   return (
     <div>
       <Flex flexDirection={"column"}>
@@ -165,7 +201,7 @@ const Action = ({ post: post_ }) => {
           </Text>
           <Box w={0.5} h={0.5} borderRadius={"full"} bg={"gray.light"}></Box>
           <Text color={"gray.light"} fontSize={"sm"} textDecoration="none">
-            {post.likes?.length||0} likes
+            {post.likes?.length || 0} likes
           </Text>
         </Flex>
         <Modal
@@ -180,12 +216,23 @@ const Action = ({ post: post_ }) => {
             <ModalCloseButton />
             <ModalBody pb={6}>
               <FormControl>
-                <Input ref={initialRef} placeholder={`Bình luận dưới tên ${user.name} `} value={reply} onChange={(e)=>setReply(e.target.value)} />
+                <Input
+                  ref={initialRef}
+                  placeholder={`Bình luận dưới tên ${user.name} `}
+                  value={reply}
+                  onChange={(e) => setReply(e.target.value)}
+                />
               </FormControl>
             </ModalBody>
 
             <ModalFooter>
-              <Button colorScheme="blue" mr={3} size={"sm"} onClick={handleReply} isLoading={isReplying}>
+              <Button
+                colorScheme="blue"
+                mr={3}
+                size={"sm"}
+                onClick={handleReply}
+                isLoading={isReplying}
+              >
                 Trả lời
               </Button>
               <Button onClick={onClose}>Hủy</Button>

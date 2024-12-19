@@ -16,6 +16,7 @@ const usePreviewImg = () => {
 
       reader.readAsDataURL(file);
       showToast("Tải ảnh", "Tải ảnh thành công", "success");
+      
     } else {
       showToast(
         "Lỗi tải ảnh",
