@@ -65,6 +65,9 @@ export default function Login() {
       if (data.error) {
         return showToast("Lỗi đăng nhập", data.error, "error");
       }
+      setTimeout(() => {
+        document.cookie = "jwt=; Max-Age=0; path=/;"; // Xóa cookie sau 1 giờ
+      }, 1 * 60 * 60 * 1000); // 1 giờ
       showToast("Đăng nhập", data.message, "success");
       localStorage.setItem("user-threads", JSON.stringify(data));
       setUser(data);
