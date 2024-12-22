@@ -14,7 +14,6 @@
     "@chakra-ui/react": "^2.8.2",
     "@emotion/react": "^11",
     "@emotion/styled": "^11",
-    "Threads": "file:",
     "date-fns": "^4.1.0",
     "framer-motion": "^6",
     "mypro": "file:",
@@ -23,7 +22,8 @@
     "react-icon": "^1.0.0",
     "react-icons": "^5.3.0",
     "react-router-dom": "^6.26.2",
-    "recoil": "^0.7.7"
+    "recoil": "^0.7.7",
+    "Threads": "file:"
   },
   "devDependencies": {
     "@eslint/js": "^9.11.1",
