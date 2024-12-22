@@ -33,3 +33,5 @@ down nodemon
 
 # yarn add date-fns
 Lệnh yarn add date-fns được sử dụng để cài đặt thư viện date-fns vào dự án của bạn. date-fns là một thư viện JavaScript phổ biến để xử lý và định dạng ngày tháng theo cách nhẹ nhàng và hiệu quả.
+
+# yarn add cross-env@^7.0.3
