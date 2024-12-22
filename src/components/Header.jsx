@@ -7,6 +7,7 @@ import { Link as RouterLink } from "react-router-dom";
 import { MdLogout } from "react-icons/md";
 import useLogout from "../hooks/useLogout";
 import authScreenAtom from "../atoms/authAtom";
+import { BsFillChatQuoteFill } from "react-icons/bs";
 const Header = () => {
   const { colorMode, toggleColorMode } = useColorMode();
   const user = useRecoilValue(userAtom);
@@ -39,6 +40,9 @@ const Header = () => {
         <Flex alignItems={"center"} gap={4}>
           <Link as={RouterLink} to={`/${user.username}`}>
             <RxAvatar size={24} />
+          </Link>
+          <Link as={RouterLink} to={`/chat`}>
+            <BsFillChatQuoteFill size={20} />
           </Link>
           <Button size={"sm"} onClick={logout}>
             <MdLogout fontSize={"20px"} />

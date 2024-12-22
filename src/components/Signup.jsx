@@ -51,7 +51,7 @@ export default function Signup() {
         body : JSON.stringify(inputs)
       });
       const data = await res.json(); 
-      console.log(data);
+      // console.log(data);
       if(data.error){
         console.log(data.error);
        toast({
