@@ -1,5 +1,16 @@
-import { Avatar, Divider, Flex, Image, Skeleton, SkeletonCircle, Text, useColorModeValue } from "@chakra-ui/react";
+import {
+  Avatar,
+  Divider,
+  Flex,
+  Image,
+  Skeleton,
+  SkeletonCircle,
+  Text,
+  useColorModeValue,
+} from "@chakra-ui/react";
 import React from "react";
+import Message from "./Message";
+import MessageInput from "./MessageInput";
 
 const MessageContainer = () => {
   return (
@@ -24,9 +35,9 @@ const MessageContainer = () => {
         gap={4}
         my={4}
         height={"400px"}
-        overflowY={"scroll"}
+        overflowY={"auto"}
       >
-        {true &&
+        {false &&
           [...Array(5)].map((_, i) => (
             <Flex
               key={i}
@@ -43,10 +54,21 @@ const MessageContainer = () => {
                 <Skeleton h={"8px"} w={"250px"} />
                 <Skeleton h={"8px"} w={"250px"} />
               </Flex>
-              {i % 2 !== 0 && <SkeletonCircle size={7}/>}
+              {i % 2 !== 0 && <SkeletonCircle size={7} />}
             </Flex>
           ))}
+
+        <Message ownMessage={true} />
+        <Message ownMessage={false} />
+        <Message ownMessage={false} />
+        <Message ownMessage={false} />
+        <Message ownMessage={false} />
+        <Message ownMessage={false} />
+        <Message ownMessage={false} />
+        <Message ownMessage={false} />
       </Flex>
+
+      <MessageInput/>
     </Flex>
   );
 };
