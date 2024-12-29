@@ -7,7 +7,7 @@ const MessageInput = () => {
       <InputGroup>
         <Input w={"full"} placeholder="Nhập tin nhắn ở đây" />
         <InputRightElement>
-          <IoSendSharp color={"green.500"} />
+          <IoSendSharp  />
         </InputRightElement>
       </InputGroup>
     </form>
