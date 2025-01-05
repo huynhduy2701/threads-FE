@@ -1,10 +1,39 @@
 import { SearchIcon } from '@chakra-ui/icons';
 import { Box, Button, Flex, Input, Skeleton, SkeletonCircle, Text, useColorModeValue } from '@chakra-ui/react'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Conversation from '../components/Conversation';
 import {GiConversation} from "react-icons/gi"
 import MessageContainer from '../components/MessageContainer';
+import useShowToast from '../hooks/useShowToast';
+import { useRecoilState } from 'recoil';
+import { conversationAtom, selectedConversationAtom } from '../atoms/messagesAtom';
 const ChatPage = () => {
+  const showToast = useShowToast();
+  const [loadingConversation, setLoadingConversation] = useState(true);
+  const [conversations, setConversations] = useRecoilState(conversationAtom);
+  const [selectedConversation, setSelectedConversation] = useRecoilState(selectedConversationAtom);
+
+  useEffect(() => {
+    const getConversation = async () => {
+      setLoadingConversation(true);
+      try {
+        const res = await fetch("/api/messages/conversations");
+        const data = await res.json();
+        if (data.error) {
+          return showToast("Error", data.error, "error");
+        }
+        console.log("data in chatPage for getConversation : ", data);
+        setConversations(data.conversations);
+        console.log("conversations in chatpage ", conversations);
+      } catch (error) {
+        showToast("Error", error.message, "error");
+      } finally {
+        setLoadingConversation(false);
+      }
+    };
+    getConversation();
+  }, [showToast, setConversations]);
+
   return (
     <Box
       position={"absolute"}
@@ -12,7 +41,7 @@ const ChatPage = () => {
       w={{ base: "100%", md: "80%", lg: "750px" }}
       transform={"translateX(-50%)"}
       p={4}
-      border={"1px solid red"}
+      // border={"1px solid red"}
     >
       <Flex
         gap={4}
@@ -41,7 +70,7 @@ const ChatPage = () => {
               </Button>
             </Flex>
           </form>
-          {true &&
+          {loadingConversation &&
             [0, 1, 2, 3, 4].map((_, i) => (
               <Flex
                 key={i}
@@ -60,11 +89,18 @@ const ChatPage = () => {
                 </Flex>
               </Flex>
             ))}
-          <Conversation />
-          <Conversation />
+          {!loadingConversation &&
+            conversations.map((conversation) => (
+              <Conversation
+                key={conversation._id}
+                conversation={conversation}
+              />
+            ))}
         </Flex>
 
-        {/* <Flex
+        {!selectedConversation._id && (
+
+        <Flex
           flex={70}
           borderRadius={"md"}
           p={2}
@@ -78,9 +114,10 @@ const ChatPage = () => {
             Vui lòng chọn một cuộc trò chuyện để bắt đầu nhắn tin
           </Text>
         </Flex>
-         */}
+        )}
+
         {/* <Flex flex={70}>Tin Nhắn</Flex> */}
-        <MessageContainer />
+        {selectedConversation._id && <MessageContainer />}
       </Flex>
     </Box>
   );

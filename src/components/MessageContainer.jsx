@@ -8,11 +8,41 @@ import {
   Text,
   useColorModeValue,
 } from "@chakra-ui/react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Message from "./Message";
 import MessageInput from "./MessageInput";
+import useShowToast from "../hooks/useShowToast";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { selectedConversationAtom } from "../atoms/messagesAtom";
+import userAtom from "../atoms/userAtom";
 
 const MessageContainer = () => {
+  const showToast = useShowToast();
+  const  [selectedConversation, setSelectedConversation] = useRecoilState(selectedConversationAtom);
+  const [loadingMessage, setLoadingMessage] = useState(true);
+  const [messages, setMessages] = useState([]);
+  const currentUser = useRecoilValue(userAtom);
+
+  useEffect(() => {
+    const getMessage = async () => {
+
+      try {
+        const res = await fetch(`/api/messages/${selectedConversation.userId}`);
+        const data = await res.json();
+        if (data.error) {
+          return showToast("Error", data.error, "error");
+        }
+        console.log("data in MessageContainer : ", data);
+        setMessages(Array.isArray(data) ? data : []); // Đảm bảo rằng messages luôn là một mảng
+      } catch (error) {
+        showToast("error", error.message, "error");
+      }finally{
+        setLoadingMessage(false);
+      }
+    };
+
+    getMessage();
+  }, [showToast]);
   return (
     <Flex
       flex={70}
@@ -37,7 +67,7 @@ const MessageContainer = () => {
         height={"400px"}
         overflowY={"auto"}
       >
-        {false &&
+        {loadingMessage &&
           [...Array(5)].map((_, i) => (
             <Flex
               key={i}
@@ -58,17 +88,17 @@ const MessageContainer = () => {
             </Flex>
           ))}
 
-        <Message ownMessage={true} />
-        <Message ownMessage={false} />
-        <Message ownMessage={false} />
-        <Message ownMessage={false} />
-        <Message ownMessage={false} />
-        <Message ownMessage={false} />
-        <Message ownMessage={false} />
-        <Message ownMessage={false} />
+        {!loadingMessage &&
+          messages.map((message) => (
+            <Message
+              key={message._id}
+              message={message}
+              ownMessage={currentUser._id === message.sender}
+            />
+          ))}
       </Flex>
 
-      <MessageInput/>
+      <MessageInput />
     </Flex>
   );
 };

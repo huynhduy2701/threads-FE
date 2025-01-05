@@ -17,10 +17,10 @@ const HomePage = () => {
       try {
         const res = await fetch("/api/post/feed");
         const data = await res.json();
-        console.log("data homepage : ", data);
         if (data.error) {
           return showToast("Lỗi bảng tin", data.error, "error");
         }
+        console.log("data homepage : ", data);
         setPosts(data);
       } catch (error) {
         console.error("error home page : ", error);

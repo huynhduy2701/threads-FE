@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   Flex,
+  Image,
   Link,
   Menu,
   MenuButton,
@@ -101,11 +102,27 @@ const UserHeader = ({ user }) => {
     <VStack gap={4} alignItems={"start"}>
       <Flex justifyContent={"space-between"} w={"full"}>
         <Box>
-          <Text fontSize={"2xl"} fontWeight={"bold"}>
+          <Text
+            fontSize={"2xl"}
+            fontWeight={"bold"}
+            display={"flex"}
+            alignItems={"center"}
+          >
             {user.name}
+            <Image
+              src="/verify.png"
+              w={7}
+              h={7}
+              ml={1}
+              title="Đã xác minh"
+              alignItems={"center"}
+              cursor={"pointer"}
+            />
           </Text>
+
           <Flex gap={2} alignItems={"center"}>
-            <Text fontSize={"sm"}>{user.username}</Text>
+            <Text fontSize={"sm"}>{user.username} </Text>
+
             <Text
               fontSize={{ base: "xs", md: "sm", lg: "md" }}
               bg={"gray.dark"}
