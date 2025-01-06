@@ -33,7 +33,9 @@ const MessageContainer = () => {
           return showToast("Error", data.error, "error");
         }
         console.log("data in MessageContainer : ", data);
-        setMessages(Array.isArray(data) ? data : []); // Đảm bảo rằng messages luôn là một mảng
+        console.log("selectedConversation in MessageContainer : ", selectedConversation);
+        setMessages(Array.isArray(data.messages) ? data.messages : []); // Đảm bảo rằng messages luôn là một mảng
+
       } catch (error) {
         showToast("error", error.message, "error");
       }finally{
@@ -42,7 +44,10 @@ const MessageContainer = () => {
     };
 
     getMessage();
-  }, [showToast]);
+  }, [showToast,selectedConversation]);
+  console.log("messages in MessageContainer : ", messages);
+  
+
   return (
     <Flex
       flex={70}
