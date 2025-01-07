@@ -25,7 +25,8 @@ const MessageContainer = () => {
 
   useEffect(() => {
     const getMessage = async () => {
-
+      setLoadingMessage(true);
+      setMessages([]);
       try {
         const res = await fetch(`/api/messages/${selectedConversation.userId}`);
         const data = await res.json();
@@ -34,7 +35,8 @@ const MessageContainer = () => {
         }
         console.log("data in MessageContainer : ", data);
         console.log("selectedConversation in MessageContainer : ", selectedConversation);
-        setMessages(Array.isArray(data.messages) ? data.messages : []); // Đảm bảo rằng messages luôn là một mảng
+        // setMessages(Array.isArray(data.messages) ? data.messages : []); // Đảm bảo rằng messages luôn là một mảng
+        setMessages(Array.isArray(data.messages) ? data.messages.reverse() : []); // Đảm bảo rằng messages luôn là một mảng và đảo ngược mảng
 
       } catch (error) {
         showToast("error", error.message, "error");
@@ -58,9 +60,9 @@ const MessageContainer = () => {
     >
       {/* Message header  */}
       <Flex w={"full"} h={12} alignItems={"center"} gap={2} pl={2}>
-        <Avatar src="" size={"sm"} />
+        <Avatar src={selectedConversation.userProfilePic} size={"sm"} />
         <Text display={"flex"} alignItems={"center"}>
-          Henry <Image src={"/verify.png"} h={4} w={4} ml={1} />
+          {selectedConversation.username} <Image src={"/verify.png"} h={4} w={4} ml={1} />
         </Text>
       </Flex>
 
@@ -103,7 +105,7 @@ const MessageContainer = () => {
           ))}
       </Flex>
 
-      <MessageInput />
+      <MessageInput setMessages={setMessages}/>
     </Flex>
   );
 };
