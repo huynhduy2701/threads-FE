@@ -48,7 +48,9 @@ const MessageContainer = () => {
     getMessage();
   }, [showToast,selectedConversation]);
   console.log("messages in MessageContainer : ", messages);
-  
+  useEffect(() => {
+    console.log("messages in MessageContainer : ", messages);
+  }, [messages]);
 
   return (
     <Flex
