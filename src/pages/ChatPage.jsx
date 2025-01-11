@@ -64,22 +64,25 @@ const ChatPage = () => {
       }
       console.log("searchUser in Chatpage : ", searchUser);
       console.log("currentUser in Chatpage : ", currentUser);
-      if (searchUser._id === currentUser._id) {
+
+      const messagingYourSelf = searchUser._id === currentUser._id;
+      if (messagingYourSelf) {
         return showToast(
           "Tìm người dùng",
           "Bạn không thể tìm bạn ở đây",
           "warning"
         );
       }
+      console.log("messagingYourSelf in Chatpage : ", messagingYourSelf);
       //nếu user đã tồn tại trong cuộc trò chuyện
-      if (
+       if (
         conversations.find(
-          (conversation) => conversation.participants[0].id === searchUser._id
+          (conversation) => conversation.participants[0]._id === searchUser._id
         )
       ) {
         setSelectedConversation({
           _id: conversations.find(
-            (conversation) => conversation.participants[0].id === searchUser._id
+            (conversation) => conversation.participants[0]._id === searchUser._id
           )._id,
           userId: searchUser._id,
           username: searchUser.username,

@@ -44,7 +44,7 @@ export default {
         "react/prop-types": "off", // Tắt kiểm tra prop-types nếu bạn sử dụng TypeScript
         "no-unused-vars": "warn", // Cảnh báo nếu có biến không sử dụng
         "@typescript-eslint/no-unused-vars": ["warn"], // Kiểm tra biến không sử dụng trong TypeScript
-        "@typescript-eslint/explicit-module-boundary-types": "off", // Tắt kiểm tra kiểu trả về cho function
+        "@typescript-eslint/explicit-module-boundary-types": "on", // Tắt kiểm tra kiểu trả về cho function
       },
     },
   ],
