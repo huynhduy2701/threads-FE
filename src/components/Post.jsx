@@ -27,7 +27,7 @@ const Post = ({ post, postedBy }) => {
         console.log("postedBy : ", postedBy);
         console.log("data in Post : ", data);
         if (data.error) {
-          return showToast("Lỗi bảng tin", data.error, "error");
+          return showToast("Lỗi bảng tin ", data.error, "error");
         }
         setUser(data);
       } catch (error) {

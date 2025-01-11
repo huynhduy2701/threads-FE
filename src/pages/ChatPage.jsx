@@ -75,26 +75,39 @@ const ChatPage = () => {
       }
       console.log("messagingYourSelf in Chatpage : ", messagingYourSelf);
       //nếu user đã tồn tại trong cuộc trò chuyện
-       if (
-        conversations.find(
-          (conversation) => conversation.participants[0]._id === searchUser._id
-        )
-      ) {
+      const conversationExist = conversations.find(
+        (conversation) => conversation.participants[0]._id === searchUser._id
+      );
+      if (conversationExist) {
         setSelectedConversation({
-          _id: conversations.find(
-            (conversation) => conversation.participants[0]._id === searchUser._id
-          )._id,
+          _id: conversationExist._id,
           userId: searchUser._id,
           username: searchUser.username,
           userProfilePic: searchUser.profilePic,
         });
         return;
       }
-
       console.log(
         "selectedConversation in Chatpage affter search :",
         selectedConversation
       );
+
+      const mockConversation = {
+        mock : true,
+        lastMessage:{
+          text : "",
+          sender : "",
+        },
+        _id : Date.now(),
+        participants : [
+          {
+            _id : searchingUser._id,
+            username : searchingUser.username,
+            profilePic : searchingUser.profilePic
+          }
+        ]
+      }
+      setConversations((prevConvs) => [...prevConvs, mockConversation]);
     } catch (error) {
       showToast("error", error.message, "error");
     } finally {
