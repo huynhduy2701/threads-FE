@@ -1,18 +1,37 @@
-import { SearchIcon } from '@chakra-ui/icons';
-import { Box, Button, Flex, Input, Skeleton, SkeletonCircle, Text, useColorModeValue } from '@chakra-ui/react'
-import React, { useEffect, useState } from 'react'
-import Conversation from '../components/Conversation';
-import {GiConversation} from "react-icons/gi"
-import MessageContainer from '../components/MessageContainer';
-import useShowToast from '../hooks/useShowToast';
-import { useRecoilState } from 'recoil';
-import { conversationAtom, selectedConversationAtom } from '../atoms/messagesAtom';
+import { SearchIcon } from "@chakra-ui/icons";
+import {
+  Box,
+  Button,
+  Flex,
+  Input,
+  Skeleton,
+  SkeletonCircle,
+  Text,
+  useColorModeValue,
+} from "@chakra-ui/react";
+import React, { useEffect, useState } from "react";
+import Conversation from "../components/Conversation";
+import { GiConversation } from "react-icons/gi";
+import MessageContainer from "../components/MessageContainer";
+import useShowToast from "../hooks/useShowToast";
+import { useRecoilState, useRecoilValue } from "recoil";
+import {
+  conversationAtom,
+  selectedConversationAtom,
+} from "../atoms/messagesAtom";
+import userAtom from "../atoms/userAtom";
 const ChatPage = () => {
-  const showToast = useShowToast();
   const [loadingConversation, setLoadingConversation] = useState(true);
   const [conversations, setConversations] = useRecoilState(conversationAtom);
-  const [selectedConversation, setSelectedConversation] = useRecoilState(selectedConversationAtom);
+  const [selectedConversation, setSelectedConversation] = useRecoilState(
+    selectedConversationAtom
+  );
+  const currentUser = useRecoilValue(userAtom);
+  const [searchingUser, setSearchingUser] = useState(false);
+  const [searchText, setSearchText] = useState("");
+  const showToast = useShowToast();
 
+  console.log("selectedConversation in Chatpage : ", selectedConversation);
   useEffect(() => {
     const getConversation = async () => {
       setLoadingConversation(true);
@@ -33,6 +52,52 @@ const ChatPage = () => {
     };
     getConversation();
   }, [showToast, setConversations]);
+
+  const handleConversationSearch = async (e) => {
+    e.preventDefault();
+    setSearchingUser(true);
+    try {
+      const res = await fetch(`/api/users/profile/${searchText}`);
+      const searchUser = await res.json();
+      if (searchUser.error) {
+        return showToast("Error", searchUser.error, "error");
+      }
+      console.log("searchUser in Chatpage : ", searchUser);
+      console.log("currentUser in Chatpage : ", currentUser);
+      if (searchUser._id === currentUser._id) {
+        return showToast(
+          "Tìm người dùng",
+          "Bạn không thể tìm bạn ở đây",
+          "warning"
+        );
+      }
+      //nếu user đã tồn tại trong cuộc trò chuyện
+      if (
+        conversations.find(
+          (conversation) => conversation.participants[0].id === searchUser._id
+        )
+      ) {
+        setSelectedConversation({
+          _id: conversations.find(
+            (conversation) => conversation.participants[0].id === searchUser._id
+          )._id,
+          userId: searchUser._id,
+          username: searchUser.username,
+          userProfilePic: searchUser.profilePic,
+        });
+        return;
+      }
+
+      console.log(
+        "selectedConversation in Chatpage affter search :",
+        selectedConversation
+      );
+    } catch (error) {
+      showToast("error", error.message, "error");
+    } finally {
+      setSearchingUser(false);
+    }
+  };
 
   return (
     <Box
@@ -62,10 +127,17 @@ const ChatPage = () => {
           >
             Cuộc trò chuyện của bạn
           </Text>
-          <form>
+          <form onSubmit={handleConversationSearch}>
             <Flex alignItems={"center"} gap={2}>
-              <Input placeholder="Tìm kiếm người dùng..." />
-              <Button size={"sm"}>
+              <Input
+                placeholder="Tìm kiếm người dùng..."
+                onChange={(e) => setSearchText(e.target.value)}
+              />
+              <Button
+                size={"sm"}
+                onClick={handleConversationSearch}
+                isLoading={searchingUser}
+              >
                 <SearchIcon />
               </Button>
             </Flex>
@@ -99,21 +171,20 @@ const ChatPage = () => {
         </Flex>
 
         {!selectedConversation._id && (
-
-        <Flex
-          flex={70}
-          borderRadius={"md"}
-          p={2}
-          flexDir={"column"}
-          alignItems={"center"}
-          justifyContent={"center"}
-          height={400}
-        >
-          <GiConversation size={100} />
-          <Text fontSize={20}>
-            Vui lòng chọn một cuộc trò chuyện để bắt đầu nhắn tin
-          </Text>
-        </Flex>
+          <Flex
+            flex={70}
+            borderRadius={"md"}
+            p={2}
+            flexDir={"column"}
+            alignItems={"center"}
+            justifyContent={"center"}
+            height={400}
+          >
+            <GiConversation size={100} />
+            <Text fontSize={20}>
+              Vui lòng chọn một cuộc trò chuyện để bắt đầu nhắn tin
+            </Text>
+          </Flex>
         )}
 
         {/* <Flex flex={70}>Tin Nhắn</Flex> */}
@@ -121,6 +192,6 @@ const ChatPage = () => {
       </Flex>
     </Box>
   );
-}
+};
 
-export default ChatPage
+export default ChatPage;
