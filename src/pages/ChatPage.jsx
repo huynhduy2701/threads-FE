@@ -56,6 +56,7 @@ const ChatPage = () => {
   const handleConversationSearch = async (e) => {
     e.preventDefault();
     setSearchingUser(true);
+    
     try {
       const res = await fetch(`/api/users/profile/${searchText}`);
       const searchUser = await res.json();
@@ -93,20 +94,20 @@ const ChatPage = () => {
       );
 
       const mockConversation = {
-        mock : true,
-        lastMessage:{
-          text : "",
-          sender : "",
+        mock: true,
+        lastMessage: {
+          text: "",
+          sender: "",
         },
-        _id : Date.now(),
+        _id: Date.now(),
         participants : [
           {
-            _id : searchingUser._id,
-            username : searchingUser.username,
-            profilePic : searchingUser.profilePic
-          }
-        ]
-      }
+            _id: searchUser._id,
+            username: searchUser.username,
+            profilePic: searchUser.profilePic,
+          },
+        ],
+      };
       setConversations((prevConvs) => [...prevConvs, mockConversation]);
     } catch (error) {
       showToast("error", error.message, "error");

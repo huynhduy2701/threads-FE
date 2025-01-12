@@ -23,11 +23,16 @@ const MessageContainer = () => {
   const [messages, setMessages] = useState([]);
   const currentUser = useRecoilValue(userAtom);
 
+  console.log("selectedConversation in MessageContainer : ", selectedConversation);
+
   useEffect(() => {
     const getMessage = async () => {
       setLoadingMessage(true);
       setMessages([]);
       try {
+        if (selectedConversation.mock) {
+          return
+        }
         const res = await fetch(`/api/messages/${selectedConversation.userId}`);
         const data = await res.json();
         if (data.error) {
