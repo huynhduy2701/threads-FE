@@ -20,6 +20,7 @@ import {
   selectedConversationAtom,
 } from "../atoms/messagesAtom";
 import userAtom from "../atoms/userAtom";
+import { useSocket } from "../../context/SocketContext";
 const ChatPage = () => {
   const [loadingConversation, setLoadingConversation] = useState(true);
   const [conversations, setConversations] = useRecoilState(conversationAtom);
@@ -30,6 +31,7 @@ const ChatPage = () => {
   const [searchingUser, setSearchingUser] = useState(false);
   const [searchText, setSearchText] = useState("");
   const showToast = useShowToast();
+  const {socket,onlineUsers} = useSocket();
 
   console.log("selectedConversation in Chatpage : ", selectedConversation);
   useEffect(() => {
@@ -182,6 +184,7 @@ const ChatPage = () => {
             conversations.map((conversation) => (
               <Conversation
                 key={conversation._id}
+                isOnline={onlineUsers.includes(conversation.participants[0]._id)}
                 conversation={conversation}
               />
             ))}
