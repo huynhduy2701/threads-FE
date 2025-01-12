@@ -218,7 +218,7 @@ const Action = ({post}) => {
               <FormControl>
                 <Input
                   ref={initialRef}
-                  placeholder={`Bình luận dưới tên ${user.name} `}
+                  placeholder={`Bình luận dưới tên ${user?.name} `}
                   value={reply}
                   onChange={(e) => setReply(e.target.value)}
                 />

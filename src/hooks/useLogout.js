@@ -3,11 +3,12 @@ import { useRecoilValue, useSetRecoilState } from "recoil";
 import userAtom from "../atoms/userAtom";
 import useShowToast from "./useShowToast";
 import HomePage from "../pages/HomePage";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 const useLogout = () => {
   const setUser = useSetRecoilState(userAtom);
   const showToast = useShowToast();
    const user = useRecoilValue(userAtom);
+   const navigate = useNavigate();
   const logout = async () => {
     try {
       localStorage.removeItem("user-threads");
@@ -27,8 +28,8 @@ const useLogout = () => {
       }
       showToast("Đăng xuất", data.message, "success");
       localStorage.removeItem("user-threads");
-    //   user ? <HomePage /> : <Navigate to="/auth" />;
-
+      // user ? <HomePage /> : <Navigate to="/auth" />;
+      navigate("/auth"); // Điều hướng người dùng đến trang đăng nhập
       setUser(null);
     } catch (error) {
       console.log(error);
