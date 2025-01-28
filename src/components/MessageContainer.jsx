@@ -15,6 +15,7 @@ import useShowToast from "../hooks/useShowToast";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { selectedConversationAtom } from "../atoms/messagesAtom";
 import userAtom from "../atoms/userAtom";
+import { useSocket } from "../context/SocketContext";
 
 const MessageContainer = () => {
   const showToast = useShowToast();
@@ -22,8 +23,18 @@ const MessageContainer = () => {
   const [loadingMessage, setLoadingMessage] = useState(true);
   const [messages, setMessages] = useState([]);
   const currentUser = useRecoilValue(userAtom);
+  const {socket} = useSocket();
 
   console.log("selectedConversation in MessageContainer : ", selectedConversation);
+
+  useEffect(() => {
+    socket?.on("newMessage", (newMessage) => {
+      setMessages((prevMessages) => [...prevMessages, newMessage]);
+    });
+    return () => {
+      socket.off("newMessage");
+    };
+  }, [socket]);
 
   useEffect(() => {
     const getMessage = async () => {

@@ -20,7 +20,7 @@ import {
   selectedConversationAtom,
 } from "../atoms/messagesAtom";
 import userAtom from "../atoms/userAtom";
-import { useSocket } from "../../context/SocketContext";
+import { useSocket } from "../context/SocketContext";
 const ChatPage = () => {
   const [loadingConversation, setLoadingConversation] = useState(true);
   const [conversations, setConversations] = useRecoilState(conversationAtom);

@@ -14,8 +14,9 @@ import { mode } from "@chakra-ui/theme-tools";
 import { BrowserRouter } from "react-router-dom";
 // Nhập RecoilRoot từ thư viện recoil
 import { RecoilRoot } from "recoil";
+import { SocketContextProvider } from "./context/SocketContext.jsx";
 // Nhập SocketContextProvider từ context
-import { SocketContextProvider } from "../context/SocketContext.jsx";
+
 
 // Định nghĩa các styles toàn cục
 const styles = {
