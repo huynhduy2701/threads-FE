@@ -25,7 +25,6 @@ export const SocketContextProvider = ({children}) =>{
 
     // Sử dụng useEffect để kết nối socket khi component được mount và ngắt kết nối khi component bị unmount
     useEffect(() => {
-       
       // Kết nối tới server socket.io tại địa chỉ http://localhost:5500 và gửi userID trong query
       const newSocket = io("http://localhost:5500", {
         query: {
@@ -35,17 +34,19 @@ export const SocketContextProvider = ({children}) =>{
       // Cập nhật state socket
       setSocket(newSocket);
 
+      // Lắng nghe sự kiện getOnlineUsers và cập nhật danh sách người dùng trực tuyến
       newSocket.on("getOnlineUsers", (users) => {
         setOnlineUsers(users);
       });
 
-      
       // Ngắt kết nối socket khi component bị unmount
       return () => newSocket && newSocket.close();
     }, [user?._id]);
+
+    // In ra danh sách người dùng trực tuyến trong console
     console.log("onlineUsers in SocketContext :", onlineUsers);
 
-    // Trả về provider của SocketContext với giá trị là socket và bọc các children bên trong
+    // Trả về provider của SocketContext với giá trị là socket và onlineUsers, và bọc các children bên trong
     return (
       <SocketContext.Provider value={{ socket, onlineUsers }}>
         {children}
